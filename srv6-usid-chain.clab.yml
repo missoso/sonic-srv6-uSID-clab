@@ -1,0 +1,39 @@
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+# docker push registry.srlinux.dev/pub/sonic_converted_vm_image:202511
+name: srv6-usid-chain
+prefix: ""
+mgmt:
+  network: srv6-usid-chain
+  ipv4-subnet: 172.80.70.0/24
+topology:
+  kinds:
+    sonic-vm:
+      image: registry.srlinux.dev/pub/sonic_converted_vm_image:202511
+  nodes:
+    r1:
+      kind: sonic-vm
+      mgmt-ipv4: 172.80.70.11
+    rn:
+      kind: sonic-vm
+      mgmt-ipv4: 172.80.70.15
+    r2:
+      kind: sonic-vm
+      mgmt-ipv4: 172.80.70.12
+    r3:
+      kind: sonic-vm
+      mgmt-ipv4: 172.80.70.13
+    r4:
+      kind: sonic-vm
+      mgmt-ipv4: 172.80.70.14
+  links:
+#eth1 → Ethernet0
+#eth2 → Ethernet4
+# r1 -- r2 -- rn --r3 -- r4
+    - endpoints: ["r1:eth1", "r2:eth1"]
+    - endpoints: ["r2:eth2", "rn:eth1"]
+    - endpoints: ["rn:eth2", "r3:eth1"]
+    - endpoints: ["r3:eth2", "r4:eth1"]
+
+
+
