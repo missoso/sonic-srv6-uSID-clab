@@ -110,7 +110,7 @@ The folder named **configs** contains both the config_db.json and the frr.conf f
 
 These scripts will look info that **configs** folder and "find" hosts by checking which files exist with the format $host_name$_config_db.json and $host_name$_frr.conf
 
-# Step 2.1  - Deploy **config_db.json**
+# Step 1.1  - Deploy **config_db.json**
 
 Showing the detaied output for R1 only:
 ```bash
@@ -146,7 +146,7 @@ Released lock on /etc/sonic/reload.lock
 ```
 This step takes some time because of the config reload
 
-Step 2.2 - Deploy **frr.conf**
+# Step 1.2 - Deploy **frr.conf**
 
 Showing the detaied output for R1 only:
 ```bash
@@ -181,7 +181,7 @@ Waiting for children to finish applying config...
   rn: OK
 ```
 
-# Step 4 - Enable SRv6 in the kernel (if required)
+# Step 2 - Enable SRv6 in the kernel (if required)
 
 In all devices:
 ```
@@ -197,7 +197,7 @@ net.ipv6.conf.all.seg6_require_hmac=0
 EOF
 ```
 
-# Step 5 - SRv6 forwarding plane configuration
+# Step 3 - SRv6 forwarding plane configuration
 
 Contrarily to a physical SONiC device the following configuration inside FRR is **not accepted**:
 ```
@@ -216,7 +216,7 @@ In a nutshell there is no SAI - ASIC link here (software stub SAI instead of a r
 
 This does require some gymnastic and some extra steps.
 
-**Step 5.1 - Add the SRv6 locators**
+**Step 3.1 - Add the SRv6 locators**
 
 
 Write the SRv6 locators directly to the Linux kernel routing table thus bypassing the entire SONiC control plane stack 
@@ -235,7 +235,7 @@ sudo ip -6 route add fc00:0:3::/48 dev Loopback0
 sudo ip -6 route add fc00:0:4::/48 dev Loopback0
 ```
 
-**Step 5.2 - Configure transit devices**
+**Step 3.2 - Configure transit devices**
 
 Transit devices (r2 and rn) require a special configuration due to the fact that the SRv6 locators were added manually and directly as kernel routes.
 
@@ -252,7 +252,7 @@ sudo ip -6 route replace fc00:0:5::/48 encap seg6local action End dev Loopback0
 ```
 
 
-**Step 5.3 - Terminate SRv6 domain at r3 and not at r4**
+**Step 3.3 - Terminate SRv6 domain at r3 and not at r4**
 
 Although the ping is sourced from r1 towards r4, the SRv6 forwarding must end at r3 and then the packet is forwarded as normal IPv6 towards r4. This is solely due to the fact this is a virtual SONiC device. A simplified explanation of why: the forwarding plane is a Linux kernel which runs a software bridge that processes packets at L2 before they reach the kernel's IPv6 routing stack. When an SRv6 encapsulated packet arrives at R4, the SONiC software bridge intercepts it first. By the time the packet would reach the kernel's seg6local processing (where End.DT6 would decapsulate it and do a routing table lookup), the bridge has already made a forwarding decision, and the packet never reaches that code path.
 
@@ -263,7 +263,7 @@ sudo ip -6 route replace fc00:0:3::/48 encap seg6local action End.DT6 table main
 
 On physical SONiC hardware this limitation does not exist — the ASIC  handles SRv6 termination before any software bridge is involved, so End.DT6 on R4 would work correctly.
 
-**Step 5.4 - Configure endpoint**
+**Step 3.4 - Configure endpoint**
 
 Create the destination in r4
 ```
@@ -271,7 +271,7 @@ Create the destination in r4
 sudo ip -6 addr add 2001:db8:99::4/128 dev lo
 ```
 
-# Step 6 - uSID programming
+# Step 4 - uSID programming
 
 Define a static route towards the endpoint that exists in r4, defining the SID's to be crossed
 ```
