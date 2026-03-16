@@ -179,12 +179,11 @@ Waiting for children to finish applying config...
   rn: OK
 ```
 
-> [!NOTE]
-> The next steps regarding SRv6 data plane setup can all be executing by running the script [`setup_SRv6.py`](./setup_SRv6.py)
+
 
 # Step 2 - Enable SRv6 in the kernel (if required)
 
-In all devices:
+In all devices execute the following commands:
 ```
 sudo sysctl -w net.ipv6.conf.all.seg6_enabled=1
 sudo sysctl -w net.ipv6.conf.all.seg6_require_hmac=0
@@ -197,6 +196,10 @@ net.ipv6.conf.all.seg6_enabled=1
 net.ipv6.conf.all.seg6_require_hmac=0
 EOF
 ```
+
+> [!NOTE]
+> This step and all the way to step 4 can de executed in an automated manner by running the script [`setup_SRv6.py`](./setup_SRv6.py)
+
 
 # Step 3 - SRv6 forwarding plane configuration
 
