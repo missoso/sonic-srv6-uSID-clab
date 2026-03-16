@@ -72,8 +72,6 @@ rn has a different name for potentially in the future create a "non SRv6 router 
 
 ## 🚀 Deployment & Quick Start
 
-**Image here**
-
 # Step 1 - Deploy the virtual topology
 
 ```bash
@@ -180,6 +178,9 @@ Waiting for children to finish applying config...
   r4: OK
   rn: OK
 ```
+
+> [!NOTE]
+> The next steps regarding SRv6 data plane setup can all be executing by running the script [`setup_SRv6.py`](./setup_SRv6.py)
 
 # Step 2 - Enable SRv6 in the kernel (if required)
 
@@ -289,7 +290,7 @@ r3 - fc00:0:3::
 
 
 
-## Validation - SRv6 flow
+## 🚀 SRv6 traffic flow
 
 ![Topology](./images/srv6-usid-chain.drawio.png)
 
