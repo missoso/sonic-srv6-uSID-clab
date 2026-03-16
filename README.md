@@ -93,7 +93,7 @@ containerlab deploy -t srv6-usid-chain.clab.yml --reconfigure
 ```
 
 > [!NOTE]
-> Wait until all the containers status is "healthy", it may take a few minutes until they all move from "starting" to "healthy", monitor with "docker ps | grep $container_name" or simply run the "containerlab inspect" in the same directory of the deployment. It is possible that even with state = healthy the SwSS container is not yet fully ready so a "config reload" (next steps) will fail, the only solution is wait a bit further
+> Wait until all the containers status is "healthy", it may take a few minutes until they all move from "starting" to "healthy", monitor with "docker ps | grep $container_name" or simply run the "containerlab inspect" in the same directory of the deployment. It is possible that even with state = healthy the SwSS (Switch State Service container) container is not yet fully ready so a "config reload" (next steps) will fail, the only solution is to wait a bit further
 
 # Step 1 - Deploy SONiC config files 
 
