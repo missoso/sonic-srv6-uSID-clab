@@ -8,7 +8,7 @@ The key goals of this repository are:
 
 3- Via packets capture display the SRv6 uSID (micro SID) behaviour
 
-There are several differences form using physical hardware due to the fact that the SAI (Switch Abstraction Interface) on a physical hardware box interacts with the ASIC while in Container Lab it will interact with the kernel, which has some implications regarding packet forwarding.
+There are several differences form using physical hardware due to the fact that the SAI (Switch Abstraction Interface) on a physical hardware box interacts with the ASIC while in Container Lab it will interact with the kernel, which has some implications regarding packet forwarding which will imply some additional configuration steps that are detailed in the deployment section.
 
 ## Container Lab image
 
@@ -70,7 +70,7 @@ rn has a different name for potentially in the future create a "non SRv6 router 
 
 
 
-## 🚀 Deployment & Quick Start
+## 🚀 Deployment
 
 # Step 1 - Deploy the virtual topology
 
