@@ -326,6 +326,9 @@ Capture in r2 (check the RT6 field)
 admin@r2:~$ sudo tcpdump -i Ethernet0 -n -v ip6
 tcpdump: listening on Ethernet0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 13:38:40.616118 IP6 (flowlabel 0x530ce, hlim 64, next-header Routing (43) payload length: 160) 2001:db8:12::1 > fc00:0:2::: RT6 (len=6, type=4, segleft=2, last-entry=2, flags=0x0, tag=0, [0]fc00:0:3::, [1]fc00:0:5::, [2]fc00:0:2::) IP6 (flowlabel 0x530ce, hlim 64, next-header ICMPv6 (58) payload length: 64) 2001:db8:1::1 > 2001:db8:99::4: [icmp6 sum ok] ICMP6, echo request, id 8, seq 1
+
+# RT6 (len=6, type=4, segleft=2, last-entry=2, flags=0x0, tag=0, [0]fc00:0:3::, [1]fc00:0:5::, [2]fc00:0:2::)
+
 ```
 
 Capture in rn (check the RT6 field)
@@ -333,6 +336,9 @@ Capture in rn (check the RT6 field)
 admin@rn:~$ sudo tcpdump -i Ethernet0 -n -v ip6
 tcpdump: listening on Ethernet0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 13:38:41.216963 IP6 (flowlabel 0x530ce, hlim 63, next-header Routing (43) payload length: 160) 2001:db8:12::1 > fc00:0:5::: RT6 (len=6, type=4, segleft=1, last-entry=2, flags=0x0, tag=0, [0]fc00:0:3::, [1]fc00:0:5::, [2]fc00:0:2::) IP6 (flowlabel 0x530ce, hlim 64, next-header ICMPv6 (58) payload length: 64) 2001:db8:1::1 > 2001:db8:99::4: [icmp6 sum ok] ICMP6, echo request, id 8, seq 1
+
+# RT6 (len=6, type=4, segleft=1, last-entry=2, flags=0x0, tag=0, [0]fc00:0:3::, [1]fc00:0:5::, [2]fc00:0:2::) 
+
 ```
 
 Capture in r3 (check the RT6 field)
@@ -340,6 +346,8 @@ Capture in r3 (check the RT6 field)
 admin@r3:~$ sudo tcpdump -i Ethernet0 -n -v ip6
 tcpdump: listening on Ethernet0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 13:38:41.265869 IP6 (flowlabel 0x530ce, hlim 62, next-header Routing (43) payload length: 160) 2001:db8:12::1 > fc00:0:3::: RT6 (len=6, type=4, segleft=0, last-entry=2, flags=0x0, tag=0, [0]fc00:0:3::, [1]fc00:0:5::, [2]fc00:0:2::) IP6 (flowlabel 0x530ce, hlim 64, next-header ICMPv6 (58) payload length: 64) 2001:db8:1::1 > 2001:db8:99::4: [icmp6 sum ok] ICMP6, echo request, id 8, seq 1
+
+# RT6 (len=6, type=4, segleft=0, last-entry=2, flags=0x0, tag=0, [0]fc00:0:3::, [1]fc00:0:5::, [2]fc00:0:2::) 
 ```
 
 1 - All the micro segments are compressed into one IPv6 address, and not 128 bits per SID as we would have without uSID
