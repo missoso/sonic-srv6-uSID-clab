@@ -12,7 +12,7 @@ There are several differences form using physical hardware due to the fact that 
 
 ## Container Lab image
 
-The [`srv6-usid-chain.clab.yml`](./srv6-usid-chain.clab.yml) file declaratively describes the lab, inside that file the image currently being used for SONiC is the following one:
+The [`srv6-usid-chain.clab.yml`](./srv6-usid-chain.clab.yml) file declaratively describes the lab, inside that file the image currently being used for SONiC is:
 
 ```
 topology:
@@ -21,20 +21,13 @@ topology:
       image: registry.srlinux.dev/pub/sonic_converted_vm_image:202511
 ```
 
-Any other image can be used as long as it supports SRv6, and in the repository [sonic-l2ls-evpn-containerlab](https://github.com/missoso/sonic-l2ls-evpn-containerlab) there are details on how to build your own image if required.
-
-It is possible that SRv6 is compiled-in on the SONiC build but not active in the kernel (which is the case for the image above), check:
+Any other image can be used as long as it supports SRv6, and in the repository [sonic-l2ls-evpn-containerlab](https://github.com/missoso/sonic-l2ls-evpn-containerlab) there are details on how to build your own image if required. It is possible that SRv6 is compiled-in on the SONiC build but not active in the kernel (which is the case for the image above), check with following commands:
 
 ```
 grep -E "SEG6|LWTUNNEL" /boot/config-$(uname -r)
 cat /proc/sys/net/ipv6/conf/all/seg6_enabled
 ```
-If the second command returns 0 the following commands are required to enable SRv6 in the kernel:
-```
-sudo sysctl -w net.ipv6.conf.all.seg6_enabled=1
-sudo sysctl -w net.ipv6.conf.all.seg6_require_hmac=0
-```
-All of the deployment steps are detailed throughout this repository, this one sits at the top because an image with such characteristics is mandatory.
+If the second command returns 0 then it will just need to be enabled in the kernel, this is covered in the deployment section.
 
 The last note is that the usage of *kind: sonic-vm* requires CPU virtualization support, if not enabled then the following error message will be displayed:
 
@@ -42,7 +35,7 @@ The last note is that the usage of *kind: sonic-vm* requires CPU virtualization 
 Cpu virtualization support is required for node "leaf1" (sonic-vm).
 ```
 
-It is not recommended to use *kind: sonic-vs* since that doesn't really mimic well a SONiC device,  processes like shmp, swss, bgp will not be running in separate containers, , and that approach has not been used or tested in this repository. 
+It is not recommended to use *kind: sonic-vs* since that doesn't really mimic well a SONiC device since processes like shmp, swss, bgp will not be running in separate containers (that approach has not been used or tested in this repository). 
 
 ## Setup
 [`srv6-usid-chain.clab.yml`](./srv6-usid-chain.clab.yml)
