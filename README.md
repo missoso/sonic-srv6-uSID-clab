@@ -103,7 +103,7 @@ These scripts will look info that **configs** folder and "find" hosts by checkin
 
 # Step 1.1  - Deploy **config_db.json**
 
-Showing the detaied output for R1 only:
+Showing the detailed output for R1 only:
 ```bash
 $ python3 deploy_config_db_json.py 
 Found 5 host(s): ['r1', 'r2', 'r3', 'r4', 'rn']
@@ -139,7 +139,7 @@ This step takes some time because of the config reload command.
 
 # Step 1.2 - Deploy **frr.conf**
 
-Showing the detaied output for R1 only:
+Showing the detailed output for R1 only:
 ```bash
 $ python3 deploy_config_frr.py 
 Found 5 host(s): ['r1', 'r2', 'r3', 'r4', 'rn']
