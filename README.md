@@ -197,7 +197,7 @@ net.ipv6.conf.all.seg6_require_hmac=0
 EOF
 ```
 
-# Step 5 - Add the SRv6 locators
+# Step 5 - SRv6 forwarding plane configuration
 
 Contrarily to a physical SONiC device the following configuration inside FRR is **not accepted**:
 ```
