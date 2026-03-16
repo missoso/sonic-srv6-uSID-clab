@@ -135,7 +135,7 @@ Released lock on /etc/sonic/reload.lock
   r4: OK
   rn: OK
 ```
-This step takes some time because of the config reload
+This step takes some time because of the config reload command.
 
 # Step 1.2 - Deploy **frr.conf**
 
