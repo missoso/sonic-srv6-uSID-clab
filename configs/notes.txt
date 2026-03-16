@@ -1,0 +1,53 @@
+
+Why do we need to add the static routes
+
+Good question. The static routes (sudo ip -6 route add fc00:0:x::/48 dev Loopback0) are needed because of how FRR validates BGP network statements.
+When you put network fc00:0:1::/48 in BGP config, FRR doesn't just advertise it unconditionally — it first checks that the prefix exists in the kernel RIB. If the route isn't in the kernel routing table, FRR considers it invalid and won't mark it as *> (best) or advertise it to peers.
+In a real hardware deployment this wouldn't be an issue because the SRv6 locator would be programmed into the hardware FIB by the SAI layer, which would also install a kernel route. But on our virtual switch (docker-syncd-vs), the SAI layer doesn't fully program SRv6 locators into the kernel, so the route never appears there automatically.
+The static route to Loopback0 is essentially a dummy entry that just tells the kernel "this prefix is reachable locally" — it doesn't actually forward any traffic, it just satisfies FRR's RIB check so it marks the network as valid and advertises it.
+The problem is these routes don't survive a reboot. We have two options to make them persistent:
+
+Add them to a SONiC startup script
+Use FRR's redistribute static or a route-map to inject them properly
+
+For now they work fine for the lab. Shall we proceed to the SRv6 testing?
+
+
+
+🎉 SRv6 is working!
+The ping succeeds with replies from 2001:db8:99::4 — SRv6 traffic steering is fully functional across the chain:
+
+r1 encapsulates with SRH: fc00:0:2:: → fc00:0:5:: → fc00:0:3::
+r2 processes End, forwards to rn ✅
+rn processes End, forwards to r3 ✅
+r3 processes End.DT6, decapsulates, forwards plain IPv6 to r4 ✅
+r4 receives plain IPv6, replies directly back to r1 via BGP ✅
+
+To summarize what we learned today:
+
+The SONiC vs platform can forward and process SRv6 transit (End behavior) perfectly
+Local SRv6 termination (End.DT6) on the vs platform doesn't work because SONiC's bridge intercepts packets before the kernel's seg6local can process them
+The workaround is to terminate SRv6 one hop before the destination and let plain IPv6 handle the last mile
+
+This is a valid and commonly used design in real networks too — the SRv6 domain edge terminates the tunnel, not necessarily the final destination. Well done getting here! 🎉
+
+
+
+Yes, your understanding is correct but let me refine one small detail:
+The path is r1 → r2 → rn → r3 → r4, not r1 → r2 → r3. The SRH fc00:0:2:: → fc00:0:5:: → fc00:0:3:: means:
+
+fc00:0:2:: = r2 processes End, forwards to rn
+fc00:0:5:: = rn processes End, forwards to r3
+fc00:0:3:: = r3 processes End.DT6, decapsulates, forwards plain IPv6 to r4
+
+So rn is in the path as a transit node — that was the whole point of having rn in the topology.
+And yes, your understanding of the limitation is exactly right. On a real hardware SONiC platform (with a proper ASIC and SAI implementation), End.DT6 would work on r4 because:
+
+The ASIC handles SRv6 termination in hardware
+The SAI layer properly programs the decapsulation behavior
+The kernel's local delivery works correctly for the decapsulated packet
+
+On the vs platform, SONiC's software bridge intercepts the packet at layer 2 before it reaches the kernel's IPv6 routing stack, so seg6local never gets a chance to process it.
+For a lab demonstrating SRv6 traffic steering and transit forwarding, what we have is fully valid and demonstrates all the key SRv6 concepts correctly.
+
+

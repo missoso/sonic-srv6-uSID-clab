@@ -1,0 +1,94 @@
+{
+    "DEVICE_METADATA": {
+        "localhost": {
+            "hwsku": "Force10-S6000",
+            "platform": "x86_64-kvm_x86_64-r0",
+            "mac": "22:01:62:bc:ce:54",
+            "hostname": "r2",
+            "type": "LeafRouter",
+            "bgp_asn": "65002",
+            "router_id": "10.0.0.2"
+        }
+    },
+    "PORT": {
+        "Ethernet0": {
+            "lanes": "25,26,27,28",
+            "alias": "fortyGigE0/0",
+            "index": "0",
+            "speed": "40000",
+            "admin_status": "up",
+            "mtu": "9100"
+        },
+        "Ethernet4": {
+            "lanes": "29,30,31,32",
+            "alias": "fortyGigE0/4",
+            "index": "1",
+            "speed": "40000",
+            "admin_status": "up",
+            "mtu": "9100"
+        },
+        "Ethernet8": {
+            "lanes": "33,34,35,36",
+            "alias": "fortyGigE0/8",
+            "index": "2",
+            "speed": "40000",
+            "admin_status": "up",
+            "mtu": "9100"
+        },
+        "Ethernet12": {
+            "lanes": "37,38,39,40",
+            "alias": "fortyGigE0/12",
+            "index": "3",
+            "speed": "40000",
+            "admin_status": "up",
+            "mtu": "9100"
+        },
+        "Ethernet16": {
+            "lanes": "45,46,47,48",
+            "alias": "fortyGigE0/16",
+            "index": "4",
+            "speed": "40000",
+            "admin_status": "up",
+            "mtu": "9100"
+        },
+        "Ethernet20": {
+            "lanes": "41,42,43,44",
+            "alias": "fortyGigE0/20",
+            "index": "5",
+            "speed": "40000",
+            "admin_status": "up",
+            "mtu": "9100"
+        },
+        "Ethernet24": {
+            "lanes": "1,2,3,4",
+            "alias": "fortyGigE0/24",
+            "index": "6",
+            "speed": "40000",
+            "admin_status": "up",
+            "mtu": "9100"
+        }
+    },
+    "FLEX_COUNTER_TABLE": {
+        "ACL": {
+            "FLEX_COUNTER_STATUS": "disable",
+            "POLL_INTERVAL": "10000"
+        }
+    },
+    "LOOPBACK_INTERFACE": {
+        "Loopback0": {},
+        "Loopback0|2001:db8:2::1/128": {},
+        "Loopback0|10.0.0.2/32": {}
+    },
+    "DEVICE_NEIGHBOR": {},
+    "INTERFACE": {
+        "Ethernet0": {},
+        "Ethernet0|2001:db8:12::2/64": {},
+        "Ethernet4": {},
+        "Ethernet4|2001:db8:25::2/64": {},
+        "Ethernet8": {},
+        "Ethernet12": {},
+        "Ethernet16": {},
+        "Ethernet20": {},
+        "Ethernet24": {}
+    }
+}
