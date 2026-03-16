@@ -209,15 +209,13 @@ segment-routing
 !
 ```
 
-In a nutshell there is no SAI - ASIC link here (software stub SAI instead of a real ASIC driver), so when *FRR* tries to apply the above the *zebra* component of it (that actually installs routes in kernel amongst other things) checks if the SAI/dataplane supports SRv6, he stub SAI returns "not supported", and FRR rejects the configuration entirely.
+In a nutshell there is no SAI - ASIC link here (software stub SAI instead of a real ASIC driver), so when *FRR* tries to apply the above the *zebra* component of it (that actually installs routes in kernel amongst other things) checks if the SAI/dataplane supports SRv6, the stub SAI returns "not supported", and FRR rejects the configuration entirely.
 
 This does require some gymnastic and some extra steps.
 
 **Step 3.1 - Add the SRv6 locators**
 
-
 Write the SRv6 locators directly to the Linux kernel routing table thus bypassing the entire SONiC control plane stack 
-
 
 ```
 #    r1:
@@ -238,7 +236,9 @@ Transit devices (r2 and rn) require a special configuration due to the fact that
 
 Using r2 as an example the locator fc00:0:2:: will exist in the kernel routing table as "normal/plain" route, so when the packet arrives for that locator the kernel will just see a packed destined to fc00:0:2:: and perform IPv6 forwarding, which in this case results to the packet being delivered locally (as in without the seg6local encap) and the SRH (Segment Routing Header) is never inspected. 
 
-It is required to instruct the kernel that when a packet is received to fc00:0:2:: it is to be treated as an SRv6 SID, apply the end behaviour and then forward it. This is achieved via the *"encap seg6local action End"*, that ensure the SRH processing and the packet being forwarded onwards (the following commands should be issued after BGP has converged):
+It is required to instruct the kernel that when a packet is received to fc00:0:2:: it is to be treated as an SRv6 SID, apply the end behaviour and then forward it. This is achieved via the *"encap seg6local action End"*, that ensures the SRH processing and the packet being forwarded onwards. 
+
+The following commands should be issued after BGP has converged:
 
 ```
 # r2:
@@ -251,7 +251,7 @@ sudo ip -6 route replace fc00:0:5::/48 encap seg6local action End dev Loopback0
 
 **Step 3.3 - Terminate SRv6 domain at r3 and not at r4**
 
-Although the ping is sourced from r1 towards r4, the SRv6 forwarding must end at r3 and then the packet is forwarded as normal IPv6 towards r4. This is solely due to the fact this is a virtual SONiC device. A simplified explanation of why: the forwarding plane is a Linux kernel which runs a software bridge that processes packets at L2 before they reach the kernel's IPv6 routing stack. When an SRv6 encapsulated packet arrives at R4, the SONiC software bridge intercepts it first. By the time the packet would reach the kernel's seg6local processing (where End.DT6 would decapsulate it and do a routing table lookup), the bridge has already made a forwarding decision, and the packet never reaches that code path.
+Although the ping is sourced from r1 towards r4, the SRv6 forwarding must end at r3 and then the packet is forwarded as normal IPv6 towards r4. This is due to the fact this is a virtual SONiC device. A simplified explanation of why: The forwarding plane is a Linux kernel which runs a software bridge that processes packets at L2 before they reach the kernel's IPv6 routing stack. When an SRv6 encapsulated packet arrives at r4, the SONiC software bridge intercepts it first. By the time the packet would reach the kernel's seg6local processing (where End.DT6 would decapsulate it and do a routing table lookup), the bridge has already made a forwarding decision, and the packet never reaches that code path.
 
 ```
 # r3:
