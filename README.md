@@ -299,7 +299,7 @@ r3: End.DT6 (decapsulates, forwards plain IPv6 to r4)
 r4: receives plain IPv6, replies via BGP
 ```
 
-r1 
+Start traffic in r1:
 ```
 admin@r1:~$ ping6 2001:db8:99::4 -I 2001:db8:1::1 -c 5
 PING 2001:db8:99::4 (2001:db8:99::4) from 2001:db8:1::1 : 56 data bytes
@@ -314,7 +314,7 @@ PING 2001:db8:99::4 (2001:db8:99::4) from 2001:db8:1::1 : 56 data bytes
 rtt min/avg/max/mdev = 11.108/13.611/19.091/2.854 ms
 ```
 
-Capture in r2 (check the RT6 field)
+Capture in r2 (check the RT6 field):
 ```
 admin@r2:~$ sudo tcpdump -i Ethernet0 -n -v ip6
 tcpdump: listening on Ethernet0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
@@ -324,7 +324,7 @@ tcpdump: listening on Ethernet0, link-type EN10MB (Ethernet), snapshot length 26
 
 ```
 
-Capture in rn (check the RT6 field)
+Capture in rn (check the RT6 field):
 ```
 admin@rn:~$ sudo tcpdump -i Ethernet0 -n -v ip6
 tcpdump: listening on Ethernet0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
@@ -334,7 +334,7 @@ tcpdump: listening on Ethernet0, link-type EN10MB (Ethernet), snapshot length 26
 
 ```
 
-Capture in r3 (check the RT6 field)
+Capture in r3 (check the RT6 field):
 ```
 admin@r3:~$ sudo tcpdump -i Ethernet0 -n -v ip6
 tcpdump: listening on Ethernet0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
