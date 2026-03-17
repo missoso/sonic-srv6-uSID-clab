@@ -6,9 +6,9 @@ The key goals of this repository are:
 
 2 - Build a SONiC SRv6 Container Lab setup
 
-3- Via packets capture display the SRv6 uSID (micro SID) behaviour
+3- Display the SRv6 uSID (micro SID) behaviour
 
-There are several differences form using physical hardware due to the fact that the SAI (Switch Abstraction Interface) on a physical hardware box interacts with the ASIC while in Container Lab it will interact with the kernel, which has some implications regarding packet forwarding which will imply some additional configuration steps that are detailed in the deployment section.
+There are several differences form using physical hardware due to the fact that the SAI (Switch Abstraction Interface) on a physical hardware box interacts with the ASIC while in Container Lab it will interact with the kernel, which has some implications regarding packet forwarding that will imply some additional configuration steps that are detailed in the deployment section.
 
 ## Container Lab image
 
@@ -29,7 +29,7 @@ cat /proc/sys/net/ipv6/conf/all/seg6_enabled
 ```
 If the second command returns 0 then it will just need to be enabled in the kernel, this is covered in the deployment section.
 
-The last note is that the usage of *kind: sonic-vm* requires CPU virtualization support, if not enabled then the following error message will be displayed:
+The last note is that the usage of *kind: sonic-vm* in the Container Lab topology file requires CPU virtualization support, if not enabled then the following error message will be displayed:
 
 ```bash
 Cpu virtualization support is required for node "leaf1" (sonic-vm).
@@ -39,11 +39,13 @@ It is not recommended to use *kind: sonic-vs* since that doesn't really mimic we
 
 ## Setup
 [`srv6-usid-chain.clab.yml`](./srv6-usid-chain.clab.yml)
+
+A simple chain of routers:
 ```
 r1 ── r2 ── rn ── r3 ── r4
 ```
 
-rn has a different name for potentially in the future create a "non SRv6 router in the middle setup" to see how the uSID transits a non SRv6 capable of router, for now, it is just a simple router.
+The device rn has a different index although today it performs the exact same functions as r2 and r3. The idea is for a future evolution of this repository to have it “non SRv6 router in the middle" setup, but for now it is "just another device".
 
 
 | Router | AS    | Loopback IPv6     | uSID Locator   | Interfaces       |
@@ -93,13 +95,13 @@ containerlab deploy -t srv6-usid-chain.clab.yml --reconfigure
 ```
 
 > [!NOTE]
-> Wait until all the containers status is "healthy", it may take a few minutes until they all move from "starting" to "healthy", monitor with "docker ps | grep $container_name" or simply run the "containerlab inspect" in the same directory of the deployment. It is possible that even with state = healthy the SwSS (Switch State Service container) container is not yet fully ready so a "config reload" (next steps) will fail, the only solution is to wait a bit further
+> Wait until all the containers status is "healthy", it may take a few minutes until they all move from "starting" to "healthy", monitor with "docker ps | grep r1" or simply run the "containerlab inspect" in the same directory of the deployment. It is possible that even with state = healthy the SwSS (Switch State Service container) container is not yet fully ready so a "config reload" (next steps) will fail, the only solution is to wait a bit further
 
 # Step 1 - Deploy SONiC config files 
 
 The folder named **configs** contains both the config_db.json and the frr.conf for each node, the python scripts [`deploy_config_db_json.py`](./deploy_config_db_json.py) and [`deploy_config_frr.py`](./deploy_config_frr.py) can automate these steps, they just require the [`paramiko`](https://www.paramiko.org/) and [`SCP`](https://pypi.org/project/scp/) packages.
 
-These scripts will look info that **configs** folder and "find" hosts by checking which files exist with the format $host_name$_config_db.json and $host_name$_frr.conf
+These scripts will look info that **configs** folder and *"find"* hosts by checking which files exist with the format $host_name$_config_db.json and $host_name$_frr.conf
 
 # Step 1.1  - Deploy **config_db.json**
 
@@ -251,14 +253,16 @@ sudo ip -6 route replace fc00:0:5::/48 encap seg6local action End dev Loopback0
 
 **Step 3.3 - Terminate SRv6 domain at r3 and not at r4**
 
-Although the ping is sourced from r1 towards r4, the SRv6 forwarding must end at r3 and then the packet is forwarded as normal IPv6 towards r4. This is due to the fact this is a virtual SONiC device. A simplified explanation of why: The forwarding plane is a Linux kernel which runs a software bridge that processes packets at L2 before they reach the kernel's IPv6 routing stack. When an SRv6 encapsulated packet arrives at r4, the SONiC software bridge intercepts it first. By the time the packet would reach the kernel's seg6local processing (where End.DT6 would decapsulate it and do a routing table lookup), the bridge has already made a forwarding decision, and the packet never reaches that code path.
+Although the ping is sourced from r1 towards r4, the SRv6 forwarding ends at r3 and then the packet is forwarded as normal IPv6 towards r4.
+
+This is due to the fact this is a virtual SONiC device. A simplified explanation of why: The forwarding plane is a Linux kernel which runs a software bridge that processes packets at L2 before they reach the kernel's IPv6 routing stack. When an SRv6 encapsulated packet arrives at r4, the SONiC software bridge intercepts it first. By the time the packet would reach the kernel's seg6local processing (where End.DT6 would decapsulate it and do a routing table lookup), the bridge has already made a forwarding decision, and the packet never reaches that code path.
 
 ```
 # r3:
 sudo ip -6 route replace fc00:0:3::/48 encap seg6local action End.DT6 table main dev Ethernet0
 ```
 
-On physical SONiC hardware this limitation does not exist — the ASIC  handles SRv6 termination before any software bridge is involved, so End.DT6 on R4 would work correctly.
+On physical SONiC hardware this limitation doesn’t exist — the ASIC handles SRv6 termination before any software bridge is involved, so End.DT6 on R4 would work correctly.
 
 **Step 3.4 - Configure endpoint**
 
