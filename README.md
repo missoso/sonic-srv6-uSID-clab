@@ -1,4 +1,4 @@
-# SONiC SRV6 uSID setup for Container Lab
+<img width="468" height="67" alt="image" src="https://github.com/user-attachments/assets/0f7cfb93-2f10-4ae2-9f7d-387c07939173" /># SONiC SRV6 uSID setup for Container Lab
 
 The key goals of this repository are:
 
@@ -362,5 +362,33 @@ To stop the lab and remove all containers:
 containerlab destroy -t srv6-usid-chain.clab.yml --cleanup
 ```
 
+# Extra: PCEP "sort of" Simulation
+ 
+It is impossible to simulate a PCEP setup in this virtual setup, no PCC daemon (which receives PCEP terminology commands and translates them to commands the router understands), FRR inside SONiC has no awareness of the SRv6 SIDs (this is why they were configured outside FRR) and gNMI SET operations are by default disabled in the VM image (Translib write disabled). Plus the SRv6 path towards r4 needs to end one router before r4 due to the limitations previosuly described.
+
+Nevertheless the script allows to illustrate some of the logic and can easily be reused for a proper PCEP setup (the first step would be to replace SSH by a proper PCEP session).
+
+**compute_path()** — builds the ERO by walking the node order and collecting transit uSIDs, excluding headend and egress; would be replaced by CSPF/Dijkstra over a live topology graph in a physical lab.
+
+**get_ssh_client()** — opens the southbound session to the headend; the SSH connection here replaces the stateful TCP 4189 PCEP session a real PCE would maintain with each PCC.
+remove_route() — cleans existing forwarding state before installing a new path; in real PCEP this is implicit since a PCUpd message replaces the existing delegated LSP automatically.
+
+**install_route()** — the PCInitiate equivalent; sends the computed SID list to the headend and programs the SRv6 encapsulation entry directly in the Linux kernel via SSH instead of via a PCEP ERO delivered to a PCC daemon.
+
+**verify_route()** — confirms the forwarding entry landed correctly by reading the kernel routing table; replaces the PCRpt message a real PCC would send back to the PCE after successfully programming a delegated LSP.
+ 
+## Running the simulation
+ 
+Remove the manually configured static route on r1:
+ 
+```bash
+sudo ip -6 route del 2001:db8:99::4/128 encap seg6 mode encap segs fc00:0:2::,fc00:0:5::,fc00:0:3:: dev Ethernet0
+```
+ 
+Run the PCE emulator from the Containerlab host:
+ 
+```bash
+python3 pce_emulator.py
+```
 
 
