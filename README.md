@@ -377,15 +377,14 @@ remove_route() — cleans existing forwarding state before installing a new path
 
 **verify_route()** — confirms the forwarding entry landed correctly by reading the kernel routing table; replaces the PCRpt message a real PCC would send back to the PCE after successfully programming a delegated LSP.
  
-## Running the simulation
  
-Remove the manually configured static route on r1:
+Step 1- Remove the manually configured static route on r1:
  
 ```bash
 sudo ip -6 route del 2001:db8:99::4/128 encap seg6 mode encap segs fc00:0:2::,fc00:0:5::,fc00:0:3:: dev Ethernet0
 ```
  
-Run the PCE emulator from the Containerlab host:
+Step 2 - Run the PCE emulator from the Containerlab host:
  
 ```bash
 python3 pce_emulator.py
