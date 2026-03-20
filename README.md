@@ -1,4 +1,4 @@
-<img width="468" height="67" alt="image" src="https://github.com/user-attachments/assets/0f7cfb93-2f10-4ae2-9f7d-387c07939173" /># SONiC SRV6 uSID setup for Container Lab
+# SONiC SRV6 uSID setup for Container Lab
 
 The key goals of this repository are:
 
